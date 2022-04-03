@@ -1,0 +1,104 @@
+[TestMethod]
+[ExpectedException(typeof(ArgumentNullException))]
+public void TestConstructorFieldNull()
+{
+    Board board = new Board(null);
+}
+
+[TestMethod]
+[ExpectedException(typeof(ArgumentException))]
+public void TestConstructorFieldNotSquareMatrix()
+{
+    Field[,] fields = new Field[2, 3];
+
+    fields[0, 0] = new Field();
+    fields[0, 1] = new Field();
+    fields[0, 2] = new Field();
+    fields[1, 0] = new Field();
+    fields[1, 1] = new Field();
+    fields[1, 2] = new Field();
+
+    Board board = new Board(fields);
+}
+
+[TestMethod]
+[ExpectedException(typeof(ArgumentNullException))]
+public void TestConstructorNullFieldsInMatrix()
+{
+    Field[,] fields = new Field[3, 3];
+ 
+     fields[0, 0] = new Field();
+    fields[0, 1] = new Field();
+    fields[0, 2] = new Field();
+    fields[1, 0] = new Field();
+    fields[1, 1] = null;
+    fields[1, 2] = new Field();
+    fields[2, 0] = new Field();
+    fields[2, 1] = new Field();
+    fields[2, 2] = new Field();
+
+    Board board = new Board(fields);
+} 
+[TestMethod]
+public void TestConstructorRegularCase()
+{
+    Field[,] fields = new Field[3, 3];
+ 
+    fields[0, 0] = new Field();
+    fields[0, 1] = new Field();
+    fields[0, 2] = new Field();
+    fields[1, 0] = new Field();
+    fields[1, 1] = new Field();
+    fields[1, 2] = new Field();
+    fields[2, 0] = new Field();
+    fields[2, 1] = new Field();
+    fields[2, 2] = new Field();
+
+    Board board = new Board(fields);
+
+    Assert.AreEqual(fields.GetLength(0), board.Fields.GetLength(0));
+    Assert.AreEqual(fields.GetLength(1), board.Fields.GetLength(1));
+} 
+[TestMethod]
+public void TestAllFieldsInRowWinCondition()
+{
+    Field[,] fields = new Field[3, 3];
+ 
+    fields[0, 0] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[0, 1] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[0, 2] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[1, 0] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[1, 1] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[1, 2] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[2, 0] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[2, 1] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+    fields[2, 2] = new Field() { FieldStatus = FIELD_STATUS.EMPTY };
+
+    Board board = new Board(fields);
+
+board.GameEnd += (sender, e) =>
+{
+    Assert.AreEqual(GAME_STATUS.PLAYER_ONE_WON, e.GameProgress);
+        Assert.AreEqual(WIN_CONDITION.ROW, e.WinCondition);
+        Assert.AreEqual(0, e.WinRowOrColumn);
+};
+fields[0, 0].FieldStatus = FIELD_STATUS.PLAYER1;
+// [X] [ ] [ ] 
+// [ ] [ ] [ ]
+// [ ] [ ] [ ]
+fields[1, 1].FieldStatus = FIELD_STATUS.PLAYER2;
+// [X] [ ] [ ] 
+// [ ] [0] [ ]
+// [ ] [ ] [ ]
+fields[0, 1].FieldStatus = FIELD_STATUS.PLAYER1;
+// [X] [X] [ ] 
+// [ ] [0] [ ]
+// [ ] [ ] [ ]
+fields[2, 2].FieldStatus = FIELD_STATUS.PLAYER2;
+// [X] [X] [ ] 
+// [ ] [0] [ ]
+// [ ] [ ] [0]
+fields[0, 2].FieldStatus = FIELD_STATUS.PLAYER1;
+// [X] [X] [X] 
+// [ ] [0] [ ]
+// [ ] [ ] [0]
